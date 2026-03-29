@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu | Roots & Recipes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- Animated Background Elements -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <!-- Navbar -->
+  <nav id="navbar" class="glass-nav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">Roots & Recipes<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="menu.html" class="active">Menu</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li>
+          <a href="cart.html" class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-counter" class="counter">0</span>
+          </a>
+        </li>
+      </ul>
+      <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+    </div>
+  </nav>
+
+  <!-- Menu Section -->
+  <section class="section" style="padding-top: 150px; min-height: 100vh;">
+    <div class="section-header fade-up">
+      <h2>Our Menu</h2>
+      <p>Handcrafted delicacies specially made for you.</p>
+    </div>
+    
+    <div class="grid-container" id="menu-grid">
+      <!-- Generated via JS -->
+    </div>
+  </section>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        menuItems = apiGetMenu();
+        renderGrid(menuItems, 'menu-grid');
+      } catch (error) {
+        console.error("Failed to fetch menu:", error);
+      }
+    });
+  </script>
+</body>
+</html>

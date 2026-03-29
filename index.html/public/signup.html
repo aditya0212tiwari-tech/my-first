@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup | Roots & Recipes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .auth-container {
+      max-width: 450px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      outline: none;
+      transition: var(--transition);
+    }
+    .form-control:focus {
+      border-color: var(--highlight);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+    .auth-btn { width: 100%; margin-top: 1rem; }
+    .auth-link { display: block; margin-top: 1.5rem; color: var(--text-secondary); }
+    .auth-link span { color: var(--highlight); text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="bg-orb orb-3" style="top:20%; right:20%;"></div>
+
+  <nav id="navbar" class="glass-nav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">Roots & Recipes<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li>
+          <a href="cart.html" class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-counter" class="counter">0</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="section" style="padding-top: 150px; min-height: 100vh; display:flex; align-items:center;">
+    <div class="auth-container glass-panel fade-up">
+      <h2 style="margin-bottom: 2rem; color: var(--highlight);">Create Account</h2>
+      <form id="signup-form">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" class="form-control" required placeholder="John Doe">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" class="form-control" required placeholder="name@example.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" required placeholder="••••••••" minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary glass-btn auth-btn">Sign Up</button>
+      </form>
+      <a href="login.html" class="auth-link">Already have an account? <span>Log in</span></a>
+    </div>
+  </section>
+
+  <div id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = apiSignup(name, email, password);
+        
+        if (res.ok) {
+          showToast(`Account created successfully!`);
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+        } else {
+          showToast(res.error || 'Signup failed');
+        }
+      } catch (err) {
+        showToast('Network error');
+      }
+    });
+  </script>
+</body>
+</html>

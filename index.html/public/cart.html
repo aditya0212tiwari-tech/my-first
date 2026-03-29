@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart | Roots & Recipes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .cart-container {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .cart-items {
+      flex: 2;
+      min-width: 300px;
+    }
+    .cart-summary {
+      flex: 1;
+      min-width: 300px;
+      height: fit-content;
+      padding: 2rem;
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.05);
+      border-radius: 15px;
+      border: 1px solid var(--glass-border);
+    }
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+    .cart-item-details { flex-grow: 1; }
+    .cart-item-title { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .cart-item-price { color: var(--highlight); font-weight: bold; }
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .quantity-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .quantity-btn:hover { background: var(--highlight); color: var(--bg-color); }
+    .remove-btn { color: var(--accent); cursor: pointer; font-size: 1.2rem; }
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    .summary-total {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--highlight);
+      border-top: 1px solid var(--glass-border);
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+    .checkout-btn { width: 100%; margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <!-- Animated Background Elements -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- Navbar -->
+  <nav id="navbar" class="glass-nav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">Roots & Recipes<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li>
+          <a href="cart.html" class="cart-icon active">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-counter" class="counter">0</span>
+          </a>
+        </li>
+      </ul>
+      <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+    </div>
+  </nav>
+
+  <!-- Cart Section -->
+  <section class="section" style="padding-top: 150px; min-height: 100vh;">
+    <div class="section-header fade-up">
+      <h2>Your Cart</h2>
+    </div>
+    
+    <div class="cart-container fade-up delay-1">
+      <div class="cart-items" id="cart-items-container">
+        <!-- Generated via JS -->
+      </div>
+      
+      <div class="cart-summary glass-panel fade-up delay-2">
+        <h3>Order Summary</h3>
+        <br>
+        <div class="summary-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+        <div class="summary-row"><span>Tax (5%)</span><span id="tax">$0.00</span></div>
+        <div class="summary-row summary-total"><span>Total</span><span id="total">$0.00</span></div>
+        
+        <button class="btn btn-primary glass-btn checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', renderCart);
+
+    function renderCart() {
+      const container = document.getElementById('cart-items-container');
+      if (cart.length === 0) {
+        container.innerHTML = '<p>Your cart is empty. <a href="menu.html" style="color:var(--highlight)">Browse Menu</a></p>';
+        updateTotals();
+        return;
+      }
+
+      container.innerHTML = '';
+      cart.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
+          <div class="cart-item-details">
+            <div class="cart-item-title">${item.name}</div>
+            <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+          </div>
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="updateQty(${index}, -1)">-</button>
+            <span>${item.quantity}</span>
+            <button class="quantity-btn" onclick="updateQty(${index}, 1)">+</button>
+          </div>
+          <div class="remove-btn" onclick="removeItem(${index})"><i class="fas fa-trash"></i></div>
+        `;
+        container.appendChild(div);
+      });
+      updateTotals();
+    }
+
+    function updateQty(index, change) {
+      if (cart[index].quantity + change <= 0) {
+        removeItem(index);
+      } else {
+        cart[index].quantity += change;
+        saveCart();
+        renderCart();
+        updateCartCounter(true);
+      }
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      saveCart();
+      renderCart();
+      updateCartCounter(true);
+      showToast('Item removed from cart');
+    }
+
+    function updateTotals() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const tax = subtotal * 0.05;
+      const total = subtotal + tax;
+      
+      document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+      document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+    }
+
+    async function checkout() {
+      if (cart.length === 0) return showToast('Cart is empty!');
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) {
+        showToast('Please login to place an order.');
+        setTimeout(() => window.location.href = 'login.html', 1500);
+        return;
+      }
+
+      const totalNum = parseFloat(document.getElementById('total').textContent.replace('$', ''));
+      try {
+        const res = apiAddOrder(user.id, cart, totalNum);
+        if (res.ok) {
+          cart = [];
+          saveCart();
+          renderCart();
+          updateCartCounter(true);
+          showToast('Order placed successfully!');
+        }
+      } catch (e) {
+        showToast('Checkout failed.');
+      }
+    }
+  </script>
+</body>
+</html>
